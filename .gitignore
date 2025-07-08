@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+*.so
+flow/
+.vscode/
+.env
+.streamlit/
+*.pdf
+*.png
+*.jpg
+Notes.md
