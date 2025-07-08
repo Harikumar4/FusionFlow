@@ -1,36 +1,42 @@
 import streamlit as st
-import sys
 import os
+import uuid
+from pathlib import Path
+import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from backend.utils.pdf_extractor import extract_text_pdf, extract_images_pdf, extract_tables_pdf
+from backend.utils.pdf_extractor import extract_text_pdf
+from backend.utils.chunk_embed import chunk_text, embed_store
 
-st.title("Multi-Modal RAG")
+DATA_DIR = "data"
+Path(DATA_DIR).mkdir(exist_ok=True)
+
+st.title("FusionFlow — Multi-Modal RAG")
 
 uploaded_file = st.file_uploader("Upload a PDF", type=["pdf"])
 
 if uploaded_file:
-    text = extract_text_pdf(uploaded_file)
-    st.subheader("Extracted Text")
-    st.text_area("Text Output", text, height=400)
+    session_id = f"doc_{uuid.uuid4().hex[:8]}"
+    st.session_state["session_id"] = session_id
 
-    uploaded_file.seek(0)
-    images = extract_images_pdf(uploaded_file)
+    save_path = Path(DATA_DIR) / f"{session_id}_{uploaded_file.name}"
+    with open(save_path, "wb") as f:
+        f.write(uploaded_file.read())
 
-    if images:
-        st.subheader("Extracted Images")
-        for img in images:
-            st.image(img)
-    else:
-        st.info("No images found in the PDF.")
+    status_box = st.empty()
+    status_box.info("Extracting text...")
+    text = extract_text_pdf(open(save_path, "rb"))
+    status_box.success("✅ Text extracted")
 
-    uploaded_file.seek(0)
-    tables = extract_tables_pdf(uploaded_file)
+    status_box = st.empty()
+    status_box.info("Chunking...")
+    chunks = chunk_text(text)
+    status_box.success("✅ Chunking done")
 
-    if tables:
-        st.subheader("Extracted Tables")
-        for i, table in enumerate(tables):
-            st.write(f"Table {i+1}")
-            st.dataframe(table)
-    else:
-        st.info("No tables found in the PDF.")
+    status_box = st.empty()
+    status_box.info("Indexing (embedding + storing)...")
+    embed_store(chunks, session_id)
+    status_box.success(f"✅ Embedded in session: {session_id}")
+
+    st.subheader("Session ID")
+    st.code(session_id)

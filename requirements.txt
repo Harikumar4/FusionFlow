@@ -1,3 +1,6 @@
 streamlit
 pymupdf
 pdfplumber
+langchain
+chromadb
+sentence-transformers

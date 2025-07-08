@@ -9,3 +9,5 @@ flow/
 *.png
 *.jpg
 Notes.md
+data/
+backend/rag/chroma_store/
