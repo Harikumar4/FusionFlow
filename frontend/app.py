@@ -7,6 +7,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from backend.utils.pdf_extractor import extract_text_pdf
 from backend.utils.chunk_embed import chunk_text, embed_store
+from backend.utils.query import retrieve_chunks, answer_with_context_groq
 
 DATA_DIR = "data"
 Path(DATA_DIR).mkdir(exist_ok=True)
@@ -40,3 +41,15 @@ if uploaded_file:
 
     st.subheader("Session ID")
     st.code(session_id)
+
+    st.markdown("---")
+
+    st.subheader("Ask a question based on the uploaded PDF")
+    user_query = st.text_input("Your question")
+
+    if user_query:
+        with st.spinner("Retrieving and answering..."):
+            top_chunks = retrieve_chunks(user_query, session_id)
+            answer = answer_with_context_groq(user_query, top_chunks)
+        st.success("Answer:")
+        st.write(answer)
