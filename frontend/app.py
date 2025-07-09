@@ -3,9 +3,10 @@ import os
 import uuid
 from pathlib import Path
 import sys
+
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from backend.utils.pdf_extractor import extract_text_pdf
+from backend.utils.pdf_extractor import embed_pages
 from backend.utils.chunk_embed import chunk_text, embed_store
 from backend.utils.query import retrieve_chunks, answer_with_context_groq
 
@@ -26,7 +27,8 @@ if uploaded_file:
 
     status_box = st.empty()
     status_box.info("Extracting text...")
-    text = extract_text_pdf(open(save_path, "rb"))
+    with open(save_path, "rb") as f:
+        text = embed_pages(f)
     status_box.success("✅ Text extracted")
 
     status_box = st.empty()
