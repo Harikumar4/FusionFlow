@@ -4,7 +4,7 @@ import chromadb
 
 
 model = SentenceTransformer("all-MiniLM-L6-v2")
-chroma_client = chromadb.PersistentClient(path="../backend/rag/chroma_store")
+chroma_client = chromadb.PersistentClient(path="./backend/rag/chroma_store")
 
 def chunk_text(text, chunk_size=500, chunk_overlap=50):
     splitter = RecursiveCharacterTextSplitter(
