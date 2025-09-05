@@ -14,7 +14,7 @@ def retrieve_chunks(query, session_id, top_k=4):
     results = collection.query(query_embeddings=[query_embedding], n_results=top_k)
     return results["documents"][0]
 
-llm = ChatGroq(model_name="llama3-8b-8192", temperature=0.3)
+llm = ChatGroq(model_name="qwen/qwen3-32b", temperature=0.3)
 
 prompt = ChatPromptTemplate.from_template(
     """
